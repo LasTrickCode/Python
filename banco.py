@@ -256,3 +256,41 @@ def consultar_lembrete_id(id_lembrete: int):
             """
             cur.execute(sql, {"id": id_lembrete})
             return cur.fetchone()
+        
+def listar_por_paciente(id_paciente):
+    with get_conexao() as con:
+        with con.cursor() as cur:
+            sql = """
+                SELECT 
+                    l.id_lembrete,
+                    c.id_consulta,
+                    c.dt_hora,
+                    c.tp_consulta,
+                    c.st_confirmacao,
+                    p.id_paciente,
+                    p.nm_paciente,
+                    p.nm_email,
+                    m.id_medico,
+                    m.nm_medico,
+                    m.nm_especialidade
+                FROM t_lembrete l
+                JOIN t_consulta c ON l.id_consulta = c.id_consulta
+                JOIN t_paciente p ON c.id_paciente = p.id_paciente
+                JOIN t_medico m ON c.id_medico = m.id_medico
+                WHERE p.id_paciente = :id_paciente
+                ORDER BY l.id_lembrete
+            """
+            cur.execute(sql, {"id_paciente": id_paciente})
+            return cur.fetchall()
+        
+def atualizar_status_confirmacao(consulta: dict):
+    with get_conexao() as con:
+        with con.cursor() as cur:
+            sql = """
+                UPDATE t_consulta
+                SET st_confirmacao = :st_confirmacao
+                WHERE id_consulta = :id_consulta
+            """
+            cur.execute(sql, consulta)
+        con.commit()
+        return cur.rowcount
