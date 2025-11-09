@@ -93,4 +93,4 @@ def recupera_paciente():
         traceback.print_exc()
         return {"erro": "Erro na consulta de pacientes"}, 400
 
-    app.run(debug=True)
+app.run(debug=True)
